@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+option go_package = "mgw";
+
+import "base.proto";
+
+/////////////////////////////////////////////////////////
+// Messages between client and public service
+
+// Message request
+message MsgReq {
+	string  id               = 1;
+	string  app              = 2;
+	Session session          = 3;
+	MsgData msg              = 4;
+	MsgAddr from             = 5;
+	repeated MsgAddr to      = 6;
+}
+
+// Response for MsgReq
+message MsgRsp {
+	string  id               = 1;
+	string  app              = 2;
+	Session session          = 3;
+	sint32  errCode          = 4;
+	string  errMsg           = 5;
+}
+
+// The Message Gateway service
+service MGW {
+	// send new messages
+	rpc Send(stream MsgReq) returns (stream MsgRsp) {}
+}
+
+/////////////////////////////////////////////////////////
+// Messages between public service and internal service
+
+message MgwRequest {
+	enum Type {
+		Unknown              = 0;
+		MsgReq               = 1;
+	}
+	Type   type              = 1;
+	uint64 tsNanos           = 2;
+
+	MsgReq msgReq            = 3;
+}
+
+/////////////////////////////////////////////////////////
+// Messages sent by internal service to store
+
+// An event
+message MgwEvent {
+	enum Type {
+		Unknown              = 0;
+		MsgDelivery          = 10;
+	}
+	Type    type             = 1;
+	uint64  tsNanos          = 2;
+
+	MsgDelivery msgDelivery  = 10;
+}
+
+// A message delivery event.
+message MsgDelivery {
+	MsgReq  req              = 1;
+	repeated MsgDeliveryReport report = 2;
+}

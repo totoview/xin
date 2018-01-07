@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option go_package = "store";
+
+// An event
+message StoreEvent {
+	enum Type {
+		Unknown              = 0;
+		MsgCreated           = 32;
+		MsgUpdated           = 33;
+		MsgDeleted           = 34;
+	}
+	Type    type             = 1;
+	uint64  tsNanos          = 2;
+
+	MsgCreated msgCreated    = 32;
+	MsgUpdated msgUpdated    = 33;
+	MsgDeleted msgDeleted    = 34;
+}
+
+// A new message has been created, should include all the data
+// required by query so it doesn't need to pull data from ES. Besides,
+// by the time it reaches query, data in ES might have changed.
+message MsgCreated {
+	string index             = 1;
+	string id                = 2;
+	string type              = 3;
+	int64  ver               = 4;
+}
+
+// An existing message has been updated
+message MsgUpdated {
+}
+
+// An existing message has been deleted
+message MsgDeleted {
+}

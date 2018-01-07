@@ -1,0 +1,158 @@
+// Common message definitions
+syntax = "proto3";
+
+option go_package = "pb";
+
+// Generic data
+message Data {
+	enum Format {
+		RAW                  = 0;
+		JSON                 = 1;
+		PB                   = 2;
+	}
+
+	Format format            = 1;
+	bytes  data              = 2;
+}
+
+// Generic property
+message Property {
+	string name              = 1;
+	Data   value             = 2;
+}
+
+// Generic session data
+message Session {
+	enum Type {
+		Unknown              = 0;
+		Chat                 = 1;
+		Message              = 2;
+	}
+
+	Type type                = 1;
+	repeated Property data   = 2;
+}
+
+
+// Message channel
+message MsgChannel {
+	enum Type {
+		Unknown              = 0;
+		Chat                 = 32;
+		Message              = 33;
+		Facebook             = 64;
+		Twitter              = 65;
+	}
+
+	Type type                = 1;
+
+	ChatChannel chat         = 32;
+	MessageChannel message   = 33;
+	FacebookChannel facebook = 64;
+	TwitterChannel twitter   = 65;
+}
+
+// User role in the context of message exchange, don't confuse
+// this with application domain user roles.
+message MsgRole {
+	enum Type {
+		Unknonw              = 0;
+		Agent                = 1;
+		Client               = 2;
+	}
+	Type    type             = 1;
+}
+
+// User
+message MsgUser {
+	enum Type {
+		Unknown              = 0;
+		Chat                 = 32;
+		Message              = 33;
+		Facebook             = 64;
+		Twitter              = 65;
+	}
+
+	Type type                = 1;
+
+	ChatUser chat            = 32;
+	MessageUser message      = 33;
+	FacebookUser facebook    = 64;
+	TwitterUser twitter      = 65;
+}
+
+// Address
+message MsgAddr {
+	MsgUser user             = 1;
+	MsgChannel channel       = 2;
+}
+
+// Message data
+message MsgData {
+	enum Type {
+		Unknown              = 0;
+		Agent                = 1;
+		Client               = 2;
+		// system messages
+		BotHandover          = 128;
+		Assign               = 129;
+	}
+
+	Type    type             = 1;
+	string  id               = 2;
+	int64   ver              = 3;
+	uint64  tsNanos          = 4;
+}
+
+// Delivery status
+message MsgDeliveryStat {
+	enum Code {
+		Unknown              = 0;
+		Accepted             = 1;   // accepted for delivery
+		Sent                 = 2;   // sent to target address
+		Confirmed            = 3;   // delivery confirmed
+
+		// pending
+		Onhold               = 64;  // onhold
+
+		// failures
+		Failed               = 128; // failed, may retry
+		Aborted              = 129; // failed, no more retry
+	}
+	Code code                = 1;
+}
+
+// Delivery report
+message MsgDeliveryReport {
+	MsgAddr from             = 1;
+	MsgAddr to               = 2;
+	MsgDeliveryStat stat     = 3;
+}
+
+/////////////////////////////////////////////////////////
+// Chat
+
+message ChatUser {}
+
+message ChatChannel {}
+
+/////////////////////////////////////////////////////////
+// Message
+
+message MessageUser {}
+
+message MessageChannel {}
+
+/////////////////////////////////////////////////////////
+// Facebook
+
+message FacebookUser {}
+
+message FacebookChannel {}
+
+/////////////////////////////////////////////////////////
+// Twitter
+
+message TwitterUser {}
+
+message TwitterChannel {}

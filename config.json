@@ -1,0 +1,135 @@
+{
+	"logging": {
+		"options": {
+			"encoder": "console",
+			"level": "debug"
+		},
+		"loggers": [
+			{
+				"type": "file",
+				"file": {
+					"path": "stdout"
+				}
+			},
+			{
+				"type": "file",
+				"options": {
+					"level": "info"
+				},
+				"file": {
+					"path": "xin.log"
+				}
+			}
+		]
+	},
+
+	"mgwapi": {
+		"session": {
+			"store": {
+				"type": "bolt",
+				"bolt": {
+					"path": "mgwapi.db"
+				}
+			}
+		},
+		"interfaces": [
+			{
+				"type": "rest",
+				"secure": false,
+				"listen": "127.0.0.1:3333"
+			},
+			{
+				"type": "grpc",
+				"secure": false,
+				"listen": "127.0.0.1:4444"
+			}
+		],
+		"update": {
+			"type": "kafka",
+			"kafka": {
+				"brokers": "127.0.0.1:9092",
+				"topic": "xin-mgw-message"
+			}
+		}
+	},
+
+	"mgw": {
+		"session": {
+			"store": {
+				"type": "bolt",
+				"bolt": {
+					"path": "mgw.db"
+				}
+			}
+		},
+		"source": {
+			"batch_size": 5000,
+			"max_pending": 20000,
+			"type": "kafka",
+			"kafka": {
+				"brokers": "127.0.0.1:9092",
+				"topic": "xin-mgw-message"
+			}
+		},
+		"update": {
+			"type": "kafka",
+			"kafka": {
+				"brokers": "127.0.0.1:9092",
+				"topic": "xin-store-message"
+			}
+		}
+	},
+
+	"store": {
+		"session": {
+			"store": {
+				"type": "bolt",
+				"bolt": {
+					"path": "store.db"
+				}
+			}
+		},
+		"source": {
+			"batch_size": 5000,
+			"max_pending": 20000,
+			"type": "kafka",
+			"kafka": {
+				"brokers": "127.0.0.1:9092",
+				"topic": "xin-store-message"
+			}
+		},
+		"store": {
+			"type": "es",
+			"es": {
+				"addr": "http://127.0.0.1:9200"
+			}
+		},
+		"update": {
+			"type": "kafka",
+			"kafka": {
+				"brokers": "127.0.0.1:9092",
+				"topic": "xin-store-update"
+			}
+		}
+	},
+
+	"query": {
+		"session": {
+			"store": {
+				"type": "bolt",
+				"bolt": {
+					"path": "query.db"
+				}
+			}
+		},
+		"source": {
+			"batch_size": 5000,
+			"max_pending": 20000,
+			"type": "kafka",
+			"kafka": {
+				"brokers": "127.0.0.1:9092",
+				"topic": "xin-store-update"
+			}
+		}
+	}
+}
